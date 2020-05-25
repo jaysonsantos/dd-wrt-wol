@@ -37,16 +37,25 @@ async fn main() -> OurResult<()> {
         debug!("Requesting {}", url);
 
         let response: Response = match reqwest::get(&url).await {
-            Ok(response) => match response.json().await {
-                Ok(json_response) => json_response,
-                Err(err) => {
-                    error!("Error parsing JSON response {:?}", err);
-                    interval.tick().await;
-                    continue;
+            Ok(response) => {
+                let status = response.status();
+                match response.json().await {
+                    Ok(json_response) => json_response,
+                    Err(err) => {
+                        error!(
+                            "Error parsing JSON response status code: {} error: {:?}",
+                            status, err
+                        );
+                        interval.tick().await;
+                        continue;
+                    }
                 }
-            },
+            }
             Err(err) => {
-                error!("Failed to ask server if any machine needs to wakeup {:?}", err);
+                error!(
+                    "Failed to ask server if any machine needs to wakeup {:?}",
+                    err
+                );
                 interval.tick().await;
                 continue;
             }
