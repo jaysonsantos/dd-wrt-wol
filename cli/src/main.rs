@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use log::{debug, info};
+use log::{debug, error, info};
 use structopt::StructOpt;
 
 mod wol;
@@ -36,7 +36,21 @@ async fn main() -> OurResult<()> {
         let url = format!("{}/{}", base_url, last_entry);
         debug!("Requesting {}", url);
 
-        let response: Response = reqwest::get(&url).await?.json().await?;
+        let response: Response = match reqwest::get(&url).await {
+            Ok(response) => match response.json().await {
+                Ok(json_response) => json_response,
+                Err(err) => {
+                    error!("Error parsing JSON response {:?}", err);
+                    interval.tick().await;
+                    continue;
+                }
+            },
+            Err(err) => {
+                error!("Failed to ask server if any machine needs to wakeup {:?}", err);
+                interval.tick().await;
+                continue;
+            }
+        };
         match response.event {
             Event::Ignore => debug!("Ignored"),
             Event::MachineNotFound => panic!("Machine not found {}", config.machine_name),
