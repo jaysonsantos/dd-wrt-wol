@@ -6,6 +6,7 @@ use std::time::SystemTime;
 use async_std::sync::RwLock;
 use log::info;
 use structopt::StructOpt;
+use tide::Body;
 
 use dd_wrt_wol_common::events::{Event, Response, Wakeup};
 
@@ -81,23 +82,32 @@ async fn poll(request: Request) -> tide::Result {
     let machine_name = request.param::<String>("name")?;
     let since = request.param::<u64>("time")?;
     let response = if let Some(host) = hosts.get(machine_name.as_str()) {
-        if let Some(entry) = host.entries.iter().filter(|entry| entry > &&since).last() {
-            tide::Response::new(tide::StatusCode::Ok).body_json(&Response {
-                event: Event::Wakeup(Wakeup {
-                    mac_address: host.mac_address.clone(),
-                    broadcast_ip: host.broadcast_ip.clone(),
-                    time_of_occurrence: *entry,
-                }),
-            })?
-        } else {
-            tide::Response::new(tide::StatusCode::Ok).body_json(&Response {
-                event: Event::Ignore,
-            })?
-        }
+        let response =
+            if let Some(entry) = host.entries.iter().filter(|entry| entry > &&since).last() {
+                Response {
+                    event: Event::Wakeup(Wakeup {
+                        mac_address: host.mac_address.clone(),
+                        broadcast_ip: host.broadcast_ip.clone(),
+                        time_of_occurrence: *entry,
+                    }),
+                }
+            } else {
+                Response {
+                    event: Event::Ignore,
+                }
+            };
+
+        let mut tide_response = tide::Response::new(tide::StatusCode::Ok);
+        tide_response.set_body(Body::from_json(&response)?);
+
+        tide_response
     } else {
-        tide::Response::new(tide::StatusCode::NotFound).body_json(&Response {
+        let mut response = tide::Response::new(tide::StatusCode::NotFound);
+        response.set_body(Body::from_json(&Response {
             event: Event::MachineNotFound,
-        })?
+        })?);
+
+        response
     };
     Ok(response)
 }
@@ -113,11 +123,19 @@ async fn wake(request: Request) -> tide::Result {
                 .unwrap()
                 .as_secs(),
         );
-        tide::Response::new(tide::StatusCode::Accepted)
-            .body_string(format!("Waking up {}", machine_name))
+        let mut response = tide::Response::new(tide::StatusCode::Accepted);
+        response.set_body(Body::from_string(format!("Waking up {}", machine_name)));
+
+        response
     } else {
-        tide::Response::new(tide::StatusCode::NotFound)
-            .body_string(format!("Machine {} not found", machine_name))
+        let mut response = tide::Response::new(tide::StatusCode::NotFound);
+
+        response.set_body(Body::from_string(format!(
+            "Machine {} not found",
+            machine_name
+        )));
+
+        response
     };
 
     Ok(response)
@@ -126,15 +144,20 @@ async fn wake(request: Request) -> tide::Result {
 async fn list_wakes(request: Request) -> tide::Result {
     let hosts = request.state().read().await;
     let name: String = request.param("name")?;
-    let response = if let Some(host) = hosts.get(name.as_str()) {
-        tide::Response::new(tide::StatusCode::Ok)
-            .body_string(format!("Wakes for {} {:?}", name, host.entries))
-    } else {
-        tide::Response::new(tide::StatusCode::NotFound)
-            .body_string(format!("Machine {} not found", name))
-    };
+    if let Some(host) = hosts.get(name.as_str()) {
+        let mut response = tide::Response::new(tide::StatusCode::Ok);
+        response.set_body(Body::from_string(format!(
+            "Wakes for {} {:?}",
+            name, host.entries
+        )));
 
-    Ok(response)
+        Ok(response)
+    } else {
+        let mut response = tide::Response::new(tide::StatusCode::NotFound);
+        response.set_body(Body::from_string(format!("Machine {} not found", name)));
+
+        Ok(response)
+    }
 }
 
 #[async_std::main]
