@@ -47,6 +47,7 @@ async fn main() -> std::io::Result<()> {
     app.at("/poll/machine/:name/since/:time").get(poll);
     app.at("/wake/machine/:name").get(wake);
     app.at("/wakes/machine/:name").get(list_wakes);
+    app.at("/health").get(|_| async { Ok("OK") });
 
     app.listen(bind_address).await
 }
