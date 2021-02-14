@@ -26,7 +26,7 @@ impl Wol {
     where
         A: ToSocketAddrs,
     {
-        let mut socket = UdpSocket::bind("0.0.0.0:0").await?;
+        let socket = UdpSocket::bind("0.0.0.0:0").await?;
         socket.set_broadcast(true)?;
         socket.send_to(&self.packet, destination).await?;
         Ok(())
