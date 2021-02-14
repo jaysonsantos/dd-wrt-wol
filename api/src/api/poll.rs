@@ -1,13 +1,16 @@
 use dd_wrt_wol_common::events::{Event, Response, Wakeup};
-use tide::{Body, Result};
+use tide::{Body, Error, Result, StatusCode};
 
 use crate::Request;
 
 pub async fn poll(request: Request) -> Result {
     let hosts = request.state().read().await;
-    let machine_name = request.param::<String>("name")?;
-    let since = request.param::<u64>("time")?;
-    let response = if let Some(host) = hosts.get(machine_name.as_str()) {
+    let machine_name = request.param("name")?;
+    let since = request
+        .param("time")?
+        .parse()
+        .map_err(|err| Error::new(StatusCode::BadRequest, err))?;
+    let response = if let Some(host) = hosts.get(machine_name) {
         let response =
             if let Some(entry) = host.entries.iter().filter(|entry| entry > &&since).last() {
                 Response {

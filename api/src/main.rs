@@ -1,5 +1,5 @@
-use std::collections::HashMap;
 use std::env::{set_var, var, VarError};
+use std::{collections::HashMap, sync::Arc};
 
 use api::{list_wakes::list_wakes, poll::poll, wake::wake};
 use async_std::sync::RwLock;
@@ -19,7 +19,7 @@ pub struct Host {
 }
 
 type HostsMap = HashMap<String, Host>;
-pub type Request = tide::Request<RwLock<HostsMap>>;
+pub type Request = tide::Request<Arc<RwLock<HostsMap>>>;
 
 #[async_std::main]
 async fn main() -> std::io::Result<()> {
@@ -43,7 +43,7 @@ async fn main() -> std::io::Result<()> {
 
     let bind_address = "0.0.0.0:8089";
 
-    let mut app = tide::with_state(RwLock::new(wakes));
+    let mut app = tide::with_state(Arc::new(RwLock::new(wakes)));
     app.at("/poll/machine/:name/since/:time").get(poll);
     app.at("/wake/machine/:name").get(wake);
     app.at("/wakes/machine/:name").get(list_wakes);
