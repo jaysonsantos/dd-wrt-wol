@@ -1,7 +1,8 @@
 FROM rust:1.51 as builder
 RUN apt update \
     && apt install -y musl-tools \
-    && rustup target add x86_64-unknown-linux-musl \
+    && rustup target add x86_64-unknown-linux-musl
+
 COPY . /code
 WORKDIR /code
 RUN cargo build --release --target=x86_64-unknown-linux-musl \
