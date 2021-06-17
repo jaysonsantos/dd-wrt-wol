@@ -1,3 +1,5 @@
 /target
 deploy.sh
 .cache/
+bin/
+.vscode/

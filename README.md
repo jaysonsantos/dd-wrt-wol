@@ -4,7 +4,7 @@ It is designed to run the cli on a dd-wrt but it can simply run in any platform 
 
 ## Usage
 First you need to have the api runing somewhere like on a internet acessible server or a PaaS (like Heroku).
-To run the api you can simply call `dd-wrt-lol-api --hosts 'name=desired-computer-name,mac_address=FF:FF:FF:FF:FF:FF,broadcast_ip=192.168.1.255'` and it should start listening on the port 8089.
+To run the api you can call `dd-wrt-wol-api --hosts 'name=desired-computer-name,mac_address=FF:FF:FF:FF:FF:FF,broadcast_ip=192.168.1.255'` and it should start listening on the port 8089.
 
 ## Running the cli
 The second step is to run the cli.

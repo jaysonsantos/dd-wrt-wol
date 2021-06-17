@@ -1,9 +1,15 @@
 use crate::Request;
 
 use tide::{Body, Result};
+use tracing::{info_span, instrument, Instrument};
 
+#[instrument(skip(request))]
 pub async fn list_wakes(request: Request) -> Result {
-    let hosts = request.state().read().await;
+    let hosts = request
+        .state()
+        .read()
+        .instrument(info_span!("read_lock"))
+        .await;
     let name = request.param("name")?;
     if let Some(host) = hosts.get(name) {
         let mut response = tide::Response::new(tide::StatusCode::Ok);

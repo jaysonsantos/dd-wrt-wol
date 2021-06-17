@@ -1,10 +1,17 @@
-use dd_wrt_wol_common::events::{Event, Response, Wakeup};
 use tide::{Body, Error, Result, StatusCode};
+use tracing::{info_span, instrument, Instrument};
+
+use dd_wrt_wol_common::events::{Event, Response, Wakeup};
 
 use crate::Request;
 
+#[instrument(skip(request))]
 pub async fn poll(request: Request) -> Result {
-    let hosts = request.state().read().await;
+    let hosts = request
+        .state()
+        .read()
+        .instrument(info_span!("read_lock"))
+        .await;
     let machine_name = request.param("name")?;
     let since = request
         .param("time")?
