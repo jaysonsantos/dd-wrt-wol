@@ -5,6 +5,8 @@ ROUTER_DIRECTORY=/jffs
 API_URL=
 MACHINE_NAME=
 
+RUST_FILES = $(shell find . -iname *.rs)
+
 build-release:
 	cross build --target ${TARGET} --release -p dd-wrt-wol-cli
 
@@ -19,3 +21,14 @@ build-api:
 	cross build --target x86_64-unknown-linux-musl --release -p dd-wrt-wol-api
 
 .PHONY=build-release copy-release run build-api
+
+bin/dd-wrt-wol-api: $(RUST_FILES)
+	mkdir -p bin
+	cargo build --release
+	cp target/release/dd-wrt-wol-api ./bin/
+
+docker-push: bin/dd-wrt-wol-api
+	docker build -f local.Dockerfile -t jaysonsantos/dd-wrt-wol:tracing .
+	docker push jaysonsantos/dd-wrt-wol:tracing
+
+.PHONY=docker-push

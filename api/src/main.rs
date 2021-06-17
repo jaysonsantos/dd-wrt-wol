@@ -7,7 +7,7 @@ use opentelemetry::sdk;
 use opentelemetry_semantic_conventions as semcov;
 use structopt::StructOpt;
 use tide_tracing::TraceMiddleware;
-use tracing::{info, info_span};
+use tracing::{info, info_span, Instrument};
 use tracing_error::ErrorLayer;
 use tracing_subscriber::{prelude::*, EnvFilter};
 
@@ -35,7 +35,7 @@ async fn main() -> Result<()> {
         .with_trace_config(sdk::trace::config().with_resource(sdk::Resource::new(vec![
             semcov::resource::SERVICE_NAME.string("dd-wrt-wol-api"),
         ])))
-        .with_grpcio()
+        .with_tonic()
         .install_simple()?;
 
     let error = ErrorLayer::default();
@@ -77,7 +77,13 @@ async fn main() -> Result<()> {
     app.at("/poll/machine/:name/since/:time").get(poll);
     app.at("/wake/machine/:name").get(wake);
     app.at("/wakes/machine/:name").get(list_wakes);
-    app.at("/health").get(|_| async { Ok("OK") });
+    app.at("/health").get(|_| {
+        async {
+            info!("I'm alive!");
+            Ok("OK")
+        }
+        .instrument(info_span!("health_check"))
+    });
 
     app.listen(bind_address).await.wrap_err("failed to listen")
 }

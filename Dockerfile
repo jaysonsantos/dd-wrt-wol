@@ -1,10 +1,26 @@
-FROM rust:1.53-slim-buster as builder
+FROM rust:1.53-slim-buster as planner
 
-RUN apt update \
-    && apt install -y build-essential cmake 
+RUN cargo install cargo-chef
 
-COPY . /code
 WORKDIR /code
+COPY . ./
+RUN cargo chef prepare --recipe-path recipe.json
+
+FROM rust:1.53-slim-buster as cacher
+RUN apt update \
+    && apt install -y build-essential cmake
+WORKDIR /code
+COPY --from=planner /usr/local/cargo/bin/cargo-chef /usr/local/cargo/bin/cargo-chef
+COPY --from=planner /code/recipe.json recipe.json
+RUN cargo chef cook --release --recipe-path recipe.json
+
+FROM rust:1.53-slim-buster as builder
+RUN apt update \
+    && apt install -y build-essential cmake
+WORKDIR /code
+COPY . ./
+COPY --from=cacher /code/target target
+COPY --from=cacher /usr/local/cargo /usr/local/cargo
 RUN cargo build --release \
     && mv target/release/dd-wrt-wol-api /
 
