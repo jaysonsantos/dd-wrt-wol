@@ -10,5 +10,5 @@ async-std = { version = "1.9.0", features = ["attributes"] }
 dd-wrt-wol-common = { path = "../common" }
 env_logger = "0.8.3"
 log = "0.4.14"
-structopt = "0.3.21"
+structopt = "0.3.26"
 tide = "0.16.0"
