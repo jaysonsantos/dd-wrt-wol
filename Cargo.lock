@@ -814,9 +814,9 @@ checksum = "5443807d6dff69373d433ab9ef5378ad8df50ca6298caf15de6e52e24aaf54d5"
 
 [[package]]
 name = "erased-serde"
-version = "0.3.31"
+version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6c138974f9d5e7fe373eb04df7cae98833802ae4b11c24ac7039a21d5af4b26c"
+checksum = "388979d208a049ffdfb22fa33b9c81942215b940910bccfe258caeb25d125cb3"
 dependencies = [
  "serde",
 ]
@@ -1287,9 +1287,9 @@ dependencies = [
 
 [[package]]
 name = "log"
-version = "0.4.20"
+version = "0.4.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b5e6163cb8c49088c2c36f57875e58ccd8c87c7427f7fbd50ea6710b2f3f2e8f"
+checksum = "90ed8c1e510134f979dbc4f070f87d4313098b704861a105fe34231c70a3901c"
 dependencies = [
  "value-bag",
 ]
@@ -2437,9 +2437,9 @@ checksum = "711b9620af191e0cdc7468a8d14e709c3dcdb115b36f838e601583af800a370a"
 
 [[package]]
 name = "value-bag"
-version = "1.4.2"
+version = "1.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4a72e1902dde2bd6441347de2b70b7f5d59bf157c6c62f0c44572607a1d55bbe"
+checksum = "126e423afe2dd9ac52142e7e9d5ce4135d7e13776c529d27fd6bc49f19e3280b"
 dependencies = [
  "value-bag-serde1",
  "value-bag-sval2",
@@ -2447,9 +2447,9 @@ dependencies = [
 
 [[package]]
 name = "value-bag-serde1"
-version = "1.4.2"
+version = "1.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "07ba39dc791ecb35baad371a3fc04c6eab688c04937d2e0ac6c22b612c0357bf"
+checksum = "ede32f342edc46e84bd41fd394ce2192b553de11725dd83b6223150610c21b44"
 dependencies = [
  "erased-serde",
  "serde",
@@ -2458,9 +2458,9 @@ dependencies = [
 
 [[package]]
 name = "value-bag-sval2"
-version = "1.4.2"
+version = "1.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c3e06c10810a57bbf45778d023d432a50a1daa7d185991ae06bcfb6c654d0945"
+checksum = "0024e44b25144c2f4d0ed35d39688e0090d57753e20fef38d08e0c1a40bdf23d"
 dependencies = [
  "sval",
  "sval_buffer",
