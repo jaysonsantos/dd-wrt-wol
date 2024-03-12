@@ -6,7 +6,7 @@ edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [dependencies]
-anyhow = "1.0.80"
+anyhow = "1.0.81"
 dd-wrt-wol-common = { path = "../common" }
 env_logger = "0.11.3"
 log = "0.4.21"
