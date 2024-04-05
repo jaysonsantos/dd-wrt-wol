@@ -10,7 +10,7 @@ anyhow = "1.0.81"
 dd-wrt-wol-common = { path = "../common" }
 env_logger = "0.11.3"
 log = "0.4.21"
-reqwest = { version = "0.12.2", features = [
+reqwest = { version = "0.12.3", features = [
     "json",
     "rustls-tls"
 ], default-features = false }
